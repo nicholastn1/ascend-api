@@ -40,6 +40,9 @@ Rails.application.configure do
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
+  # ActiveStorage: Use S3 in production if configured, otherwise local
+  config.active_storage.service = ENV["S3_BUCKET"].present? ? :amazon : :local
+
   # Replace the default in-process memory cache store with a durable alternative.
   config.cache_store = :solid_cache_store
 

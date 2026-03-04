@@ -10,7 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_04_004266) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_04_021156) do
+  create_table "active_storage_attachments", id: :string, force: :cascade do |t|
+    t.string "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.string "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", id: :string, force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", id: :string, force: :cascade do |t|
+    t.string "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
   create_table "ai_prompts", id: :string, force: :cascade do |t|
     t.text "content", null: false
     t.datetime "created_at", null: false
@@ -56,6 +84,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_004266) do
     t.string "user_id", null: false
     t.index ["user_id", "updated_at"], name: "index_conversations_on_user_id_and_updated_at"
     t.index ["user_id"], name: "index_conversations_on_user_id"
+  end
+
+  create_table "embedding_chunks", id: :string, force: :cascade do |t|
+    t.integer "chunk_index", default: 0
+    t.text "chunk_text", null: false
+    t.datetime "created_at", null: false
+    t.string "document_id", null: false
+    t.string "document_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["document_id", "document_type"], name: "index_embedding_chunks_on_document_id_and_document_type"
+    t.index ["document_type"], name: "index_embedding_chunks_on_document_type"
   end
 
   create_table "job_application_contacts", id: :string, force: :cascade do |t|
@@ -122,6 +161,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_004266) do
     t.datetime "updated_at", null: false
     t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+  end
+
+  create_table "models", id: :string, force: :cascade do |t|
+    t.integer "context_window"
+    t.datetime "created_at", null: false
+    t.string "display_name"
+    t.decimal "input_price_per_million"
+    t.integer "max_tokens"
+    t.string "model_id"
+    t.decimal "output_price_per_million"
+    t.string "provider"
+    t.boolean "supports_functions"
+    t.boolean "supports_json_mode"
+    t.boolean "supports_vision"
+    t.datetime "updated_at", null: false
+    t.index ["model_id", "provider"], name: "index_models_on_model_id_and_provider", unique: true
   end
 
   create_table "oauth_accounts", id: :string, force: :cascade do |t|
@@ -240,4 +295,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_004266) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
   end
+
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
 end

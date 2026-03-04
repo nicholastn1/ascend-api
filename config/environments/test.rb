@@ -39,4 +39,10 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # ActiveStorage: Use test disk
+  config.active_storage.service = :test
+
+  # Use test adapter for Active Job (avoids Solid Queue table dependency)
+  config.active_job.queue_adapter = :test
 end

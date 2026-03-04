@@ -78,12 +78,10 @@ Rails.application.routes.draw do
 
         collection do
           get :kanban
-          scope :analytics do
-            get "analytics/overview", to: "application_analytics#overview"
-            get "analytics/timeline", to: "application_analytics#timeline"
-            get "analytics/funnel", to: "application_analytics#funnel"
-            get "analytics/avg-time", to: "application_analytics#avg_time"
-          end
+          get "analytics/overview", to: "application_analytics#overview"
+          get "analytics/timeline", to: "application_analytics#timeline"
+          get "analytics/funnel", to: "application_analytics#funnel"
+          get "analytics/avg-time", to: "application_analytics#avg_time"
         end
 
         resources :contacts, controller: "application_contacts", only: %i[index create update destroy]

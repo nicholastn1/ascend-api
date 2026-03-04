@@ -29,6 +29,13 @@ gem "jwt"
 gem "image_processing", "~> 1.2"
 gem "aws-sdk-s3", require: false
 
+# AI
+gem "ruby_llm"
+gem "sqlite-vec"
+
+# Google Sheets (RAG)
+gem "google-apis-sheets_v4"
+
 # HTTP
 gem "faraday"
 
@@ -49,4 +56,5 @@ group :development, :test do
   gem "factory_bot_rails"
   gem "faker"
   gem "shoulda-matchers"
+  gem "climate_control"
 end
