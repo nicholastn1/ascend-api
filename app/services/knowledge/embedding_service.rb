@@ -42,7 +42,7 @@ module Knowledge
 
         vectors = response.vectors
         # For single text, vectors is a flat array; for batch, it's array of arrays
-        vectors = [vectors] if texts.length == 1 && !vectors.first.is_a?(Array)
+        vectors = [ vectors ] if texts.length == 1 && !vectors.first.is_a?(Array)
 
         batch.each_with_index do |chunk, i|
           VectorSearch.insert(chunk_id: chunk.id, embedding: vectors[i])
@@ -110,13 +110,13 @@ module Knowledge
 
     def chunk_text(text)
       return [] if text.blank?
-      return [text.strip] if text.length <= CHUNK_SIZE
+      return [ text.strip ] if text.length <= CHUNK_SIZE
 
       chunks = []
       pos = 0
 
       while pos < text.length
-        chunk_end = [pos + CHUNK_SIZE, text.length].min
+        chunk_end = [ pos + CHUNK_SIZE, text.length ].min
 
         # Try to break at a sentence or paragraph boundary
         if chunk_end < text.length
@@ -133,7 +133,7 @@ module Knowledge
 
         # Advance position with overlap, but always move forward
         next_pos = chunk_end - CHUNK_OVERLAP
-        pos = [next_pos, pos + 1].max
+        pos = [ next_pos, pos + 1 ].max
       end
 
       chunks

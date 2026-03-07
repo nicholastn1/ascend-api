@@ -39,7 +39,7 @@ module Applications
       return [] if total == 0
 
       # Order statuses by typical progression
-      progression = %w[applied screening interview offer negotiation accepted]
+      progression = %w[applied screening interviewing offer accepted]
 
       cumulative = total
       progression.map do |status|

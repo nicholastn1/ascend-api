@@ -17,10 +17,7 @@ class PatchResumeTool < RubyLLM::Tool
 
     ops = operations.is_a?(String) ? JSON.parse(operations) : operations
 
-    result = Resumes::PatchResume.new(
-      resume: resume,
-      operations: ops
-    ).call
+    Resumes::PatchResume.new(resume, ops).call
 
     { success: true, message: "Applied #{ops.size} operation(s) to resume" }.to_json
   rescue JSON::ParserError => e

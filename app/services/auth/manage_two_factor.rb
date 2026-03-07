@@ -34,10 +34,11 @@ module Auth
       totp = ROTP::TOTP.new(two_factor.otp_secret, issuer: "Ascend")
       return true if totp.verify(code, drift_behind: 30)
 
-      # Check backup codes
+      # Check backup codes with constant-time comparison
       codes = two_factor.backup_codes_array
-      if codes.include?(code)
-        codes.delete(code)
+      matched_index = codes.index { |c| ActiveSupport::SecurityUtils.secure_compare(c, code) }
+      if matched_index
+        codes.delete_at(matched_index)
         two_factor.update!(backup_codes: codes.to_json)
         return true
       end
