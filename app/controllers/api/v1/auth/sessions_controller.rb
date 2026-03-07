@@ -5,6 +5,11 @@ module Api
         skip_before_action :authenticate_user!, only: :create
 
         def create
+          if ENV["FLAG_DISABLE_EMAIL_AUTH"] == "true"
+            render json: { error: "Email authentication is disabled" }, status: :forbidden
+            return
+          end
+
           result = ::Auth::AuthenticateUser.new(
             email: params[:email],
             password: params[:password],
@@ -33,8 +38,8 @@ module Api
 
         def destroy
           token = cookies.signed[:session_token] || request.headers["Authorization"]&.delete_prefix("Bearer ")
-          Session.find_by(token: token)&.destroy
-          cookies.delete(:session_token)
+          Session.find_by_token(token)&.destroy
+          delete_session_cookie
           render json: { message: "Logged out" }
         end
       end

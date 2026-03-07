@@ -5,21 +5,27 @@ module Api
         skip_before_action :authenticate_user!, only: :validate
 
         def setup
+          # If 2FA is already enabled, require current code to re-setup
+          if current_user.two_factor_enabled?
+            render json: { error: "2FA is already enabled. Disable it first to re-setup." }, status: :conflict
+            return
+          end
+
           result = ::Auth::ManageTwoFactor.new(current_user).setup
           result[:two_factor].save!
-          render json: { secret: result[:secret], uri: result[:uri] }
+          render json: { uri: result[:uri] }
         end
 
         def verify
           result = ::Auth::ManageTwoFactor.new(current_user).verify_and_enable(params[:code])
           render json: { backup_codes: result[:backup_codes] }
         rescue ::Auth::AuthError => e
-          render json: { error: e.message }, status: :unprocessable_entity
+          render json: { error: e.message }, status: :unprocessable_content
         end
 
         def validate
           # Validate 2FA code during login (using temp_token from login response)
-          payload = JWT.decode(params[:temp_token], Rails.application.secret_key_base).first
+          payload = JWT.decode(params[:temp_token], Rails.application.secret_key_base, true, algorithm: "HS256").first
           raise ::Auth::AuthError, "Invalid token" unless payload["purpose"] == "2fa"
 
           user = User.find(payload["user_id"])
@@ -38,8 +44,17 @@ module Api
         end
 
         def destroy
+          # Require current 2FA code or backup code to disable
+          unless params[:code].present?
+            render json: { error: "A valid 2FA code is required to disable 2FA" }, status: :unprocessable_content
+            return
+          end
+
+          ::Auth::ManageTwoFactor.new(current_user).validate(params[:code])
           ::Auth::ManageTwoFactor.new(current_user).disable
           render json: { message: "2FA disabled" }
+        rescue ::Auth::AuthError => e
+          render json: { error: e.message }, status: :unauthorized
         end
       end
     end

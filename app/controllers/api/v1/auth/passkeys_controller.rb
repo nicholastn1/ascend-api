@@ -18,7 +18,7 @@ module Api
           session.delete(:webauthn_challenge)
           render json: { id: passkey.id, name: passkey.name }, status: :created
         rescue WebAuthn::Error => e
-          render json: { error: e.message }, status: :unprocessable_entity
+          render json: { error: e.message }, status: :unprocessable_content
         end
 
         def authenticate_options

@@ -17,7 +17,7 @@ module Api
         token = cookies.signed[:session_token] || request.headers["Authorization"]&.delete_prefix("Bearer ")
         return unless token
 
-        session_record = Session.find_by(token: token)
+        session_record = Session.find_by_token(token)
         return unless session_record&.active?
 
         session_record.user
@@ -31,12 +31,20 @@ module Api
       end
 
       def set_session_cookie(session_record)
-        cookies.signed[:session_token] = {
-          value: session_record.token,
+        cookies.signed[:session_token] = session_cookie_options(session_record.raw_token || session_record.token, session_record.expires_at)
+      end
+
+      def delete_session_cookie
+        cookies.delete(:session_token, session_cookie_options("", 1.day.ago).except(:value, :expires))
+      end
+
+      def session_cookie_options(value, expires_at)
+        {
+          value: value,
           httponly: true,
           secure: Rails.env.production?,
           same_site: Rails.env.production? ? :none : :lax,
-          expires: session_record.expires_at
+          expires: expires_at
         }
       end
 

@@ -7,7 +7,7 @@ module Api
         def create
           user = User.find_by(confirmation_token: params[:token])
           if user.nil?
-            render json: { error: "Invalid token" }, status: :unprocessable_entity
+            render json: { error: "Invalid token" }, status: :unprocessable_content
             return
           end
 
