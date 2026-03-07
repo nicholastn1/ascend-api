@@ -23,7 +23,7 @@ class CreateApiKeys < ActiveRecord::Migration[8.1]
 
       t.index :user_id
       t.index :key_digest, unique: true
-      t.index [:enabled, :user_id]
+      t.index [ :enabled, :user_id ]
     end
   end
 end

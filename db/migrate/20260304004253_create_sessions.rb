@@ -9,7 +9,7 @@ class CreateSessions < ActiveRecord::Migration[8.1]
       t.timestamps
 
       t.index :token, unique: true
-      t.index [:token, :user_id]
+      t.index [ :token, :user_id ]
       t.index :expires_at
     end
   end

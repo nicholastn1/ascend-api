@@ -11,7 +11,7 @@ class CreateOauthAccounts < ActiveRecord::Migration[8.1]
       t.string :id_token
       t.timestamps
 
-      t.index [:provider, :provider_uid], unique: true
+      t.index [ :provider, :provider_uid ], unique: true
       t.index :user_id
     end
   end

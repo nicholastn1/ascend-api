@@ -14,7 +14,7 @@ class CreateModels < ActiveRecord::Migration[8.1]
 
       t.timestamps
 
-      t.index [:model_id, :provider], unique: true
+      t.index [ :model_id, :provider ], unique: true
     end
   end
 end

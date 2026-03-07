@@ -8,8 +8,8 @@ class CreateEmbeddings < ActiveRecord::Migration[8.1]
       t.integer :chunk_index, default: 0
       t.timestamps
 
-      t.index [:document_id, :document_type]
-      t.index [:document_type]
+      t.index [ :document_id, :document_type ]
+      t.index [ :document_type ]
     end
   end
 

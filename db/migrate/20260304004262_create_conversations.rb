@@ -8,7 +8,7 @@ class CreateConversations < ActiveRecord::Migration[8.1]
       t.timestamps
 
       t.index :user_id
-      t.index [:user_id, :updated_at]
+      t.index [ :user_id, :updated_at ]
     end
   end
 end

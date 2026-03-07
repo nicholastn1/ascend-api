@@ -12,9 +12,9 @@ class CreateResumes < ActiveRecord::Migration[8.1]
       t.timestamps
 
       t.index :user_id
-      t.index [:slug, :user_id], unique: true
-      t.index [:user_id, :updated_at]
-      t.index [:is_public, :slug, :user_id]
+      t.index [ :slug, :user_id ], unique: true
+      t.index [ :user_id, :updated_at ]
+      t.index [ :is_public, :slug, :user_id ]
     end
   end
 end

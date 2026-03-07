@@ -13,9 +13,9 @@ class CreateJobApplications < ActiveRecord::Migration[8.1]
       t.date :application_date
       t.timestamps
 
-      t.index [:user_id, :current_status]
-      t.index [:user_id, :created_at]
-      t.index [:user_id, :company_name]
+      t.index [ :user_id, :current_status ]
+      t.index [ :user_id, :created_at ]
+      t.index [ :user_id, :company_name ]
     end
   end
 end

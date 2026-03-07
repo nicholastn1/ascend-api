@@ -11,7 +11,7 @@ class CreateKnowledgeDocuments < ActiveRecord::Migration[8.1]
       t.timestamps
 
       t.index :user_id
-      t.index [:user_id, :source_type]
+      t.index [ :user_id, :source_type ]
     end
   end
 end
