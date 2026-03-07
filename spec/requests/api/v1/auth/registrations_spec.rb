@@ -26,13 +26,13 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
 
     it "returns errors for invalid params" do
       post "/api/v1/auth/register", params: { name: "", email: "" }
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "rejects duplicate email" do
       create(:user, email: "john@example.com")
       post "/api/v1/auth/register", params: valid_params
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 

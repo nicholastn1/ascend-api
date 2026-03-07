@@ -55,7 +55,7 @@ RSpec.describe VectorSearch do
 
       results = VectorSearch.search(query_embedding: Array.new(dimension) { rand }, limit: 10)
       ids = results.map { |r| r["chunk_id"] }
-      expect(ids).to eq(["c"])
+      expect(ids).to eq([ "c" ])
     end
   end
 end

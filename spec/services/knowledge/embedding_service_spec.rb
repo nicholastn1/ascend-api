@@ -20,7 +20,7 @@ RSpec.describe Knowledge::EmbeddingService do
       let(:document) { create(:knowledge_document, user: user, content: "This is a test document with enough content to embed.") }
 
       it "creates embedding chunks and stores vectors" do
-        fake_vectors = [Array.new(dimensions) { rand(-1.0..1.0) }]
+        fake_vectors = [ Array.new(dimensions) { rand(-1.0..1.0) } ]
         fake_response = double("EmbeddingResponse", vectors: fake_vectors)
         allow(RubyLLM).to receive(:embed).and_return(fake_response)
 
@@ -31,7 +31,7 @@ RSpec.describe Knowledge::EmbeddingService do
       end
 
       it "replaces existing embeddings on re-embed" do
-        fake_vectors = [Array.new(dimensions) { rand(-1.0..1.0) }]
+        fake_vectors = [ Array.new(dimensions) { rand(-1.0..1.0) } ]
         fake_response = double("EmbeddingResponse", vectors: fake_vectors)
         allow(RubyLLM).to receive(:embed).and_return(fake_response)
 
@@ -59,7 +59,7 @@ RSpec.describe Knowledge::EmbeddingService do
       end
 
       it "extracts text from resume data and creates chunks" do
-        fake_vectors = [Array.new(dimensions) { rand(-1.0..1.0) }]
+        fake_vectors = [ Array.new(dimensions) { rand(-1.0..1.0) } ]
         fake_response = double("EmbeddingResponse", vectors: fake_vectors)
         allow(RubyLLM).to receive(:embed).and_return(fake_response)
 
@@ -81,7 +81,7 @@ RSpec.describe Knowledge::EmbeddingService do
   describe "#remove_embeddings" do
     it "removes all chunks and vectors for a document" do
       document = create(:knowledge_document, user: user, content: "Test content")
-      fake_vectors = [Array.new(dimensions) { rand(-1.0..1.0) }]
+      fake_vectors = [ Array.new(dimensions) { rand(-1.0..1.0) } ]
       fake_response = double("EmbeddingResponse", vectors: fake_vectors)
       allow(RubyLLM).to receive(:embed).and_return(fake_response)
 

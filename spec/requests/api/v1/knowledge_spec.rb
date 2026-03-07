@@ -57,7 +57,7 @@ RSpec.describe "Api::V1::Knowledge", type: :request do
         params: { source_type: "text" },
         headers: headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "returns 401 when not authenticated" do
@@ -118,7 +118,7 @@ RSpec.describe "Api::V1::Knowledge", type: :request do
       document = create(:knowledge_document, user: user, source_type: "text")
       post "/api/v1/knowledge/#{document.id}/sync", headers: headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
@@ -130,7 +130,7 @@ RSpec.describe "Api::V1::Knowledge", type: :request do
 
     it "returns 422 when query is blank" do
       post "/api/v1/knowledge/search", params: { query: "" }, headers: headers
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "returns search results" do

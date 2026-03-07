@@ -41,14 +41,24 @@ RSpec.describe "Api::V1::Prompts", type: :request do
   end
 
   describe "PUT /api/v1/prompts/:slug" do
-    it "updates a prompt" do
+    it "updates a prompt when user is admin" do
+      ClimateControl.modify(ADMIN_EMAILS: user.email) do
+        put "/api/v1/prompts/test-prompt",
+          params: { content: "Updated content" },
+          headers: headers
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body["content"]).to eq("Updated content")
+        expect(prompt.reload.content).to eq("Updated content")
+      end
+    end
+
+    it "returns 403 when user is not admin" do
       put "/api/v1/prompts/test-prompt",
         params: { content: "Updated content" },
         headers: headers
 
-      expect(response).to have_http_status(:ok)
-      expect(response.parsed_body["content"]).to eq("Updated content")
-      expect(prompt.reload.content).to eq("Updated content")
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

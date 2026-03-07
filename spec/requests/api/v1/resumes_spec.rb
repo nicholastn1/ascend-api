@@ -56,7 +56,7 @@ RSpec.describe "Api::V1::Resumes", type: :request do
   describe "PATCH /api/v1/resumes/:id/patch_data" do
     it "applies JSON Patch operations" do
       resume = create(:resume, user: user, data: { "basics" => { "name" => "Old Name" } })
-      operations = [{ "op" => "replace", "path" => "/basics/name", "value" => "New Name" }]
+      operations = [ { "op" => "replace", "path" => "/basics/name", "value" => "New Name" } ]
 
       patch "/api/v1/resumes/#{resume.id}/patch_data", params: { operations: operations },
         headers: headers, as: :json
@@ -68,7 +68,7 @@ RSpec.describe "Api::V1::Resumes", type: :request do
 
     it "rejects patch on locked resume" do
       resume = create(:resume, :locked, user: user)
-      operations = [{ "op" => "replace", "path" => "/basics/name", "value" => "New" }]
+      operations = [ { "op" => "replace", "path" => "/basics/name", "value" => "New" } ]
 
       patch "/api/v1/resumes/#{resume.id}/patch_data", params: { operations: operations },
         headers: headers, as: :json
