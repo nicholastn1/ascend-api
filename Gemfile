@@ -24,6 +24,8 @@ gem "rack-attack"
 gem "hana" # RFC 6902 JSON Patch
 gem "bcrypt", "~> 3.1.7"
 gem "jwt"
+gem "rswag-api"
+gem "rswag-ui"
 
 # Storage
 gem "image_processing", "~> 1.2"
@@ -57,4 +59,5 @@ group :development, :test do
   gem "faker"
   gem "shoulda-matchers"
   gem "climate_control"
+  gem "rswag-specs"
 end

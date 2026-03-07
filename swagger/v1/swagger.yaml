@@ -1,0 +1,1793 @@
+---
+openapi: 3.0.3
+info:
+  title: Ascend API
+  version: v1
+  description: Career management platform API — resumes, job tracking, AI chat, and
+    more.
+paths:
+  "/api/v1/ai/test-connection":
+    post:
+      summary: Test AI provider connection
+      tags:
+      - AI Services
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: connection test result
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                model_id:
+                  type: string
+  "/api/v1/ai/parse-pdf":
+    post:
+      summary: Parse a PDF file with AI
+      tags:
+      - AI Services
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: PDF parsed successfully
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: file
+        description: PDF file to parse
+  "/api/v1/ai/parse-docx":
+    post:
+      summary: Parse a DOCX file with AI
+      tags:
+      - AI Services
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: DOCX parsed successfully
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: file
+        description: DOCX file to parse
+  "/api/v1/applications":
+    get:
+      summary: List job applications
+      tags:
+      - Applications
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: status
+        in: query
+        required: false
+        description: Filter by status
+        schema:
+          type: string
+      - name: company
+        in: query
+        required: false
+        description: Filter by company name
+        schema:
+          type: string
+      - name: date_from
+        in: query
+        required: false
+        description: Filter from date
+        schema:
+          type: string
+      - name: date_to
+        in: query
+        required: false
+        description: Filter to date
+        schema:
+          type: string
+      - name: salary_min
+        in: query
+        required: false
+        description: Minimum salary
+        schema:
+          type: number
+      - name: salary_max
+        in: query
+        required: false
+        description: Maximum salary
+        schema:
+          type: number
+      responses:
+        '200':
+          description: applications listed
+        '401':
+          description: unauthorized
+    post:
+      summary: Create a job application
+      tags:
+      - Applications
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: application created
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_name:
+                  type: string
+                job_title:
+                  type: string
+                job_url:
+                  type: string
+                current_status:
+                  type: string
+                salary_amount:
+                  type: number
+                salary_currency:
+                  type: string
+                salary_period:
+                  type: string
+                notes:
+                  type: string
+                application_date:
+                  type: string
+                  format: date
+              required:
+              - company_name
+              - job_title
+  "/api/v1/applications/kanban":
+    get:
+      summary: Get applications grouped by status (kanban)
+      tags:
+      - Applications
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: kanban board returned
+        '401':
+          description: unauthorized
+  "/api/v1/applications/{id}":
+    get:
+      summary: Get a job application
+      tags:
+      - Applications
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: application found
+        '404':
+          description: application not found
+        '401':
+          description: unauthorized
+    put:
+      summary: Update a job application
+      tags:
+      - Applications
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: application updated
+        '404':
+          description: application not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_name:
+                  type: string
+                job_title:
+                  type: string
+                job_url:
+                  type: string
+                salary_amount:
+                  type: number
+                salary_currency:
+                  type: string
+                salary_period:
+                  type: string
+                notes:
+                  type: string
+                application_date:
+                  type: string
+                  format: date
+    delete:
+      summary: Delete a job application
+      tags:
+      - Applications
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: application deleted
+        '401':
+          description: unauthorized
+  "/api/v1/applications/{id}/move":
+    post:
+      summary: Move application to a new status
+      tags:
+      - Applications
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: application moved
+        '422':
+          description: invalid status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - applied
+                  - screening
+                  - interview
+                  - offer
+                  - negotiation
+                  - accepted
+                  - rejected
+              required:
+              - status
+  "/api/v1/applications/{application_id}/contacts":
+    get:
+      summary: List contacts for an application
+      tags:
+      - Application Contacts
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: contacts listed
+        '401':
+          description: unauthorized
+    post:
+      summary: Create a contact for an application
+      tags:
+      - Application Contacts
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: contact created
+        '422':
+          description: validation failed
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                role:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                linkedin_url:
+                  type: string
+              required:
+              - name
+  "/api/v1/applications/{application_id}/contacts/{id}":
+    put:
+      summary: Update a contact
+      tags:
+      - Application Contacts
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: contact updated
+        '404':
+          description: contact not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                role:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                linkedin_url:
+                  type: string
+    delete:
+      summary: Delete a contact
+      tags:
+      - Application Contacts
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: contact deleted
+        '401':
+          description: unauthorized
+  "/api/v1/applications/{application_id}/history":
+    get:
+      summary: List status history for an application
+      tags:
+      - Application History
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: application_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: history listed
+        '401':
+          description: unauthorized
+  "/api/v1/applications/analytics/overview":
+    get:
+      summary: Get application analytics overview
+      tags:
+      - Application Analytics
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: overview returned
+        '401':
+          description: unauthorized
+  "/api/v1/applications/analytics/timeline":
+    get:
+      summary: Get application timeline analytics
+      tags:
+      - Application Analytics
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: period
+        in: query
+        required: false
+        description: Grouping period (week or month)
+        schema:
+          type: string
+      - name: months
+        in: query
+        required: false
+        description: Number of months to look back
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: timeline returned
+        '401':
+          description: unauthorized
+  "/api/v1/applications/analytics/funnel":
+    get:
+      summary: Get application funnel analytics
+      tags:
+      - Application Analytics
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: funnel returned
+        '401':
+          description: unauthorized
+  "/api/v1/applications/analytics/avg-time":
+    get:
+      summary: Get average time per application stage
+      tags:
+      - Application Analytics
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: average times returned
+        '401':
+          description: unauthorized
+  "/api/v1/auth/register":
+    post:
+      summary: Register a new user
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '201':
+          description: user registered
+        '422':
+          description: invalid params
+        '403':
+          description: signups disabled
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                username:
+                  type: string
+                password:
+                  type: string
+                  minLength: 8
+              required:
+              - name
+              - email
+              - username
+              - password
+  "/api/v1/auth/login":
+    post:
+      summary: Log in with email and password
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: login successful
+        '401':
+          description: invalid credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+              required:
+              - email
+              - password
+  "/api/v1/auth/logout":
+    delete:
+      summary: Log out current session
+      tags:
+      - Auth
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: logged out
+  "/api/v1/auth/session":
+    get:
+      summary: Get current session / user info
+      tags:
+      - Auth
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: session info returned
+        '401':
+          description: unauthorized
+  "/api/v1/auth/forgot-password":
+    post:
+      summary: Request a password reset email
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: reset email sent (always succeeds to prevent enumeration)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+              - email
+  "/api/v1/auth/reset-password":
+    post:
+      summary: Reset password with token
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: password reset successfully
+        '422':
+          description: invalid or expired token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                password:
+                  type: string
+                  minLength: 8
+              required:
+              - token
+              - password
+  "/api/v1/auth/verify-email":
+    post:
+      summary: Verify email address with token
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: email verified
+        '422':
+          description: invalid token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+              required:
+              - token
+  "/api/v1/auth/providers":
+    get:
+      summary: List enabled authentication providers
+      tags:
+      - Auth
+      responses:
+        '200':
+          description: providers list
+  "/api/v1/auth/account":
+    delete:
+      summary: Delete current user account
+      tags:
+      - Auth
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: account deleted
+        '401':
+          description: unauthorized
+  "/api/v1/auth/oauth/{provider}":
+    get:
+      summary: Redirect to OAuth provider
+      tags:
+      - Auth - OAuth
+      parameters:
+      - name: provider
+        in: path
+        description: "OAuth provider (google, github):\n * `google` \n * `github`
+          \n "
+        enum:
+        - google
+        - github
+        required: true
+        schema:
+          type: string
+      responses:
+        '302':
+          description: redirects to provider authorization URL
+  "/api/v1/auth/oauth/{provider}/callback":
+    get:
+      summary: Handle OAuth provider callback
+      tags:
+      - Auth - OAuth
+      parameters:
+      - name: provider
+        in: path
+        description: "OAuth provider (google, github):\n * `google` \n * `github`
+          \n "
+        enum:
+        - google
+        - github
+        required: true
+        schema:
+          type: string
+      - name: code
+        in: query
+        required: false
+        description: Authorization code
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: false
+        description: CSRF state parameter
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OAuth callback processed
+  "/api/v1/auth/two-factor/setup":
+    post:
+      summary: Set up two-factor authentication
+      tags:
+      - Auth - 2FA
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: 2FA provisioning URI returned
+        '401':
+          description: unauthorized
+  "/api/v1/auth/two-factor/verify":
+    post:
+      summary: Verify TOTP code and enable 2FA
+      tags:
+      - Auth - 2FA
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: 2FA enabled, backup codes returned
+        '422':
+          description: invalid TOTP code
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 6-digit TOTP code
+              required:
+              - code
+  "/api/v1/auth/two-factor/validate":
+    post:
+      summary: Validate 2FA code during login
+      tags:
+      - Auth - 2FA
+      parameters: []
+      responses:
+        '200':
+          description: 2FA validated, session created
+        '401':
+          description: invalid or expired temp token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                temp_token:
+                  type: string
+                  description: Temporary JWT token from login response
+                code:
+                  type: string
+                  description: 6-digit TOTP code or backup code
+              required:
+              - temp_token
+              - code
+  "/api/v1/auth/two-factor":
+    delete:
+      summary: Disable two-factor authentication
+      tags:
+      - Auth - 2FA
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: 2FA disabled
+        '422':
+          description: missing code
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: Current 2FA code to confirm disable
+              required:
+              - code
+  "/api/v1/auth/passkeys/register/options":
+    post:
+      summary: Get WebAuthn registration options
+      tags:
+      - Auth - Passkeys
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: registration options returned
+        '401':
+          description: unauthorized
+  "/api/v1/auth/passkeys/register":
+    post:
+      summary: Register a new passkey
+      tags:
+      - Auth - Passkeys
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: passkey registered
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                rawId:
+                  type: string
+                type:
+                  type: string
+                name:
+                  type: string
+                authenticatorAttachment:
+                  type: string
+                transports:
+                  type: array
+                  items:
+                    type: string
+                response:
+                  type: object
+                  properties:
+                    clientDataJSON:
+                      type: string
+                    attestationObject:
+                      type: string
+              required:
+              - id
+              - rawId
+              - type
+              - response
+  "/api/v1/auth/passkeys/authenticate/options":
+    post:
+      summary: Get WebAuthn authentication options
+      tags:
+      - Auth - Passkeys
+      responses:
+        '200':
+          description: authentication options returned
+  "/api/v1/auth/passkeys/authenticate":
+    post:
+      summary: Authenticate with a passkey
+      tags:
+      - Auth - Passkeys
+      parameters: []
+      responses:
+        '200':
+          description: authenticated with passkey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                rawId:
+                  type: string
+                type:
+                  type: string
+                response:
+                  type: object
+                  properties:
+                    clientDataJSON:
+                      type: string
+                    authenticatorData:
+                      type: string
+                    signature:
+                      type: string
+                    userHandle:
+                      type: string
+              required:
+              - id
+              - rawId
+              - type
+              - response
+  "/api/v1/auth/passkeys/{id}":
+    delete:
+      summary: Remove a passkey
+      tags:
+      - Auth - Passkeys
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        description: Passkey ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: passkey removed
+        '401':
+          description: unauthorized
+  "/api/v1/auth/api-keys":
+    get:
+      summary: List all API keys for current user
+      tags:
+      - Auth - API Keys
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: API keys listed
+        '401':
+          description: unauthorized
+    post:
+      summary: Create a new API key
+      tags:
+      - Auth - API Keys
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: API key created
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                expires_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+                permissions:
+                  type: array
+                  items:
+                    type: string
+              required:
+              - name
+  "/api/v1/auth/api-keys/{id}":
+    put:
+      summary: Update an API key
+      tags:
+      - Auth - API Keys
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        description: API Key ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: API key updated
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                enabled:
+                  type: boolean
+                expires_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+    delete:
+      summary: Revoke an API key
+      tags:
+      - Auth - API Keys
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        description: API Key ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: API key revoked
+        '401':
+          description: unauthorized
+  "/api/v1/chat/conversations":
+    get:
+      summary: List conversations
+      tags:
+      - Chat
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: conversations listed
+    post:
+      summary: Create a conversation
+      tags:
+      - Chat
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: conversation created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                agent_type:
+                  type: string
+                model_id:
+                  type: string
+  "/api/v1/chat/conversations/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Conversation ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Show a conversation
+      tags:
+      - Chat
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: conversation found
+    put:
+      summary: Update a conversation
+      tags:
+      - Chat
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: conversation updated
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+    delete:
+      summary: Delete a conversation
+      tags:
+      - Chat
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: conversation deleted
+  "/api/v1/chat/conversations/{conversation_id}/messages":
+    parameters:
+    - name: conversation_id
+      in: path
+      description: Conversation ID
+      required: true
+      schema:
+        type: string
+    post:
+      summary: Send a message
+      tags:
+      - Chat
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: message sent (sync mode)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                stream:
+                  type: string
+                  enum:
+                  - 'true'
+                  - 'false'
+              required:
+              - content
+  "/api/v1/chat/rate-limit":
+    get:
+      summary: Check chat rate limit
+      tags:
+      - Chat
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: rate limit info returned
+  "/api/v1/knowledge":
+    get:
+      summary: List knowledge documents
+      tags:
+      - Knowledge Base
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: documents listed
+    post:
+      summary: Create a knowledge document
+      tags:
+      - Knowledge Base
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: document created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                source_type:
+                  type: string
+                  enum:
+                  - text
+                  - google_sheet
+                  - file
+                content:
+                  type: string
+                source_url:
+                  type: string
+              required:
+              - title
+              - source_type
+  "/api/v1/knowledge/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Knowledge document ID
+      required: true
+      schema:
+        type: string
+    put:
+      summary: Update a knowledge document
+      tags:
+      - Knowledge Base
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: document updated
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                source_url:
+                  type: string
+    delete:
+      summary: Delete a knowledge document
+      tags:
+      - Knowledge Base
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: document deleted
+  "/api/v1/knowledge/{id}/sync":
+    parameters:
+    - name: id
+      in: path
+      description: Knowledge document ID
+      required: true
+      schema:
+        type: string
+    post:
+      summary: Sync a Google Sheet knowledge document
+      tags:
+      - Knowledge Base
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: sync started
+  "/api/v1/knowledge/search":
+    post:
+      summary: Semantic search across knowledge base
+      tags:
+      - Knowledge Base
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: search results returned
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                limit:
+                  type: integer
+              required:
+              - query
+  "/api/v1/health":
+    get:
+      summary: Health check
+      tags:
+      - Health
+      responses:
+        '200':
+          description: service is healthy
+  "/api/v1/flags":
+    get:
+      summary: List feature flags
+      tags:
+      - Feature Flags
+      responses:
+        '200':
+          description: flags returned
+  "/api/v1/statistics/users":
+    get:
+      summary: Get total user count
+      tags:
+      - Statistics
+      responses:
+        '200':
+          description: user count returned
+  "/api/v1/statistics/resumes":
+    get:
+      summary: Get total resume count
+      tags:
+      - Statistics
+      responses:
+        '200':
+          description: resume count returned
+  "/api/v1/prompts":
+    get:
+      summary: List all prompts
+      tags:
+      - Prompts
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: prompts listed
+  "/api/v1/prompts/{slug}":
+    parameters:
+    - name: slug
+      in: path
+      description: Prompt slug
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Show a prompt
+      tags:
+      - Prompts
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: prompt found
+    put:
+      summary: Update a prompt (admin only)
+      tags:
+      - Prompts
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: prompt updated
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                content:
+                  type: string
+  "/api/v1/storage/upload":
+    post:
+      summary: Upload a file
+      tags:
+      - Storage
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: file uploaded
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: file
+        description: File to upload
+  "/api/v1/storage/files":
+    delete:
+      summary: Delete a file
+      tags:
+      - Storage
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: file deleted
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+              required:
+              - path
+  "/api/v1/profile":
+    get:
+      summary: Get current user profile
+      tags:
+      - Profile
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: profile returned
+    put:
+      summary: Update current user profile
+      tags:
+      - Profile
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: profile updated
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                username:
+                  type: string
+                display_username:
+                  type: string
+                image:
+                  type: string
+  "/api/v1/profile/password":
+    put:
+      summary: Update password
+      tags:
+      - Profile
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: password updated
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password:
+                  type: string
+                new_password:
+                  type: string
+              required:
+              - current_password
+              - new_password
+  "/api/v1/resumes":
+    get:
+      summary: List resumes
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: tag
+        in: query
+        required: false
+        description: Filter by tag
+        schema:
+          type: string
+      responses:
+        '200':
+          description: resumes listed
+        '401':
+          description: unauthorized
+    post:
+      summary: Create a resume
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: resume created
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                slug:
+                  type: string
+                is_public:
+                  type: boolean
+                tags:
+                  type: array
+                  items:
+                    type: string
+                data:
+                  type: object
+              required:
+              - name
+  "/api/v1/resumes/{id}":
+    get:
+      summary: Get a resume
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: resume found
+        '404':
+          description: resume not found
+        '401':
+          description: unauthorized
+    put:
+      summary: Update a resume
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: resume updated
+        '403':
+          description: resume is locked
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                slug:
+                  type: string
+                is_public:
+                  type: boolean
+                tags:
+                  type: array
+                  items:
+                    type: string
+                data:
+                  type: object
+    delete:
+      summary: Delete a resume
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: resume deleted
+        '401':
+          description: unauthorized
+  "/api/v1/resumes/{id}/patch_data":
+    patch:
+      summary: Patch resume data with JSON Patch operations
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: resume data patched
+        '403':
+          description: resume is locked
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operations:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      op:
+                        type: string
+                      path:
+                        type: string
+                      value: {}
+              required:
+              - operations
+  "/api/v1/resumes/{id}/duplicate":
+    post:
+      summary: Duplicate a resume
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: resume duplicated
+        '401':
+          description: unauthorized
+  "/api/v1/resumes/{id}/lock":
+    post:
+      summary: Toggle resume lock
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: lock toggled
+  "/api/v1/resumes/{id}/password":
+    put:
+      summary: Set resume password
+      tags:
+      - Resume Sharing
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: password set
+        '422':
+          description: password missing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+              required:
+              - password
+    delete:
+      summary: Remove resume password
+      tags:
+      - Resume Sharing
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: password removed
+  "/api/v1/resumes/tags":
+    get:
+      summary: List all unique tags
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: tags listed
+  "/api/v1/resumes/import":
+    post:
+      summary: Import a resume
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: resume imported
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                data:
+                  type: object
+  "/api/v1/resumes/public/{username}/{slug}":
+    get:
+      summary: View a public resume
+      tags:
+      - Resume Sharing
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: slug
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: public resume returned
+        '404':
+          description: resume not found
+  "/api/v1/resumes/public/{username}/{slug}/verify":
+    post:
+      summary: Verify password for a public resume
+      tags:
+      - Resume Sharing
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: slug
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: password verified
+        '401':
+          description: invalid password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+              required:
+              - password
+  "/api/v1/resumes/{resume_id}/statistics":
+    get:
+      summary: Get resume statistics
+      tags:
+      - Resume Statistics
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: resume_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: statistics returned
+        '401':
+          description: unauthorized
+  "/api/v1/resumes/{id}/pdf":
+    get:
+      summary: Generate PDF of a resume
+      tags:
+      - Resume Export
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: PDF generated
+  "/api/v1/resumes/{id}/screenshot":
+    get:
+      summary: Generate screenshot of a resume
+      tags:
+      - Resume Export
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: screenshot generated
+servers:
+- url: "{protocol}://{host}"
+  variables:
+    protocol:
+      default: http
+      enum:
+      - http
+      - https
+    host:
+      default: localhost:3000
+components:
+  securitySchemes:
+    bearer_auth:
+      type: http
+      scheme: bearer
+    cookie_auth:
+      type: apiKey
+      in: cookie
+      name: session_token
+    api_key_auth:
+      type: apiKey
+      in: header
+      name: X-API-Key
