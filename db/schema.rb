@@ -328,3 +328,4 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_010000) do
   add_foreign_key "sessions", "users"
   add_foreign_key "tool_calls", "messages"
   add_foreign_key "two_factors", "users"
+end
