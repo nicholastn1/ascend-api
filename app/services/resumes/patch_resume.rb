@@ -15,6 +15,4 @@ module Resumes
       @resume
     end
   end
-
-  class ResumeLockedError < StandardError; end
 end
