@@ -12,6 +12,7 @@ module Chat
       # Save user message
       @conversation.messages.create!(role: "user", content: @content)
 
+      Ai::ConfigureRubyLlm.call
       ai_config = AiConfig.instance
       model_id = @conversation.model_id.presence || ai_config.model
       chat = RubyLLM.chat(model: model_id)

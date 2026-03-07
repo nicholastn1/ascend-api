@@ -8,11 +8,12 @@ module Ai
     def initialize(file:, type:, model_id: nil)
       @file = file
       @type = type
-      @model_id = model_id || ENV.fetch("DEFAULT_PARSE_MODEL", "openrouter/auto")
+      @model_id = model_id || AiConfig.instance.model.presence || ENV.fetch("DEFAULT_PARSE_MODEL", "openrouter/auto")
     end
 
     def call
       validate!
+      Ai::ConfigureRubyLlm.call
 
       slugs = SUPPORTED_TYPES[@type]
       system_prompt = load_prompt(slugs[:system_slug])

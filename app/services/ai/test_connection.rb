@@ -1,10 +1,11 @@
 module Ai
   class TestConnection
     def initialize(model_id: nil)
-      @model_id = model_id || ENV.fetch("DEFAULT_CHAT_MODEL", "openrouter/auto")
+      @model_id = model_id || AiConfig.instance.model.presence || ENV.fetch("DEFAULT_CHAT_MODEL", "openrouter/auto")
     end
 
     def call
+      Ai::ConfigureRubyLlm.call
       chat = RubyLLM.chat(model: @model_id)
       response = chat.ask("Respond with exactly: OK")
 
