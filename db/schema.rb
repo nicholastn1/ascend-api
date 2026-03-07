@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_04_021156) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_07_010000) do
   create_table "active_storage_attachments", id: :string, force: :cascade do |t|
     t.string "blob_id", null: false
     t.datetime "created_at", null: false
@@ -37,6 +37,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_021156) do
     t.string "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "ai_configs", id: :string, force: :cascade do |t|
+    t.string "base_url"
+    t.datetime "created_at", null: false
+    t.string "encrypted_api_key"
+    t.string "model", default: "gpt-4o-mini", null: false
+    t.string "provider", default: "openai", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "ai_prompts", id: :string, force: :cascade do |t|
@@ -243,12 +252,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_021156) do
     t.datetime "expires_at", null: false
     t.string "ip_address"
     t.string "token", null: false
+    t.string "token_digest"
     t.datetime "updated_at", null: false
     t.string "user_agent"
     t.string "user_id", null: false
     t.index ["expires_at"], name: "index_sessions_on_expires_at"
     t.index ["token", "user_id"], name: "index_sessions_on_token_and_user_id"
     t.index ["token"], name: "index_sessions_on_token", unique: true
+    t.index ["token_digest"], name: "index_sessions_on_token_digest", unique: true
   end
 
   create_table "tool_calls", id: :string, force: :cascade do |t|
@@ -268,7 +279,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_021156) do
     t.string "otp_secret"
     t.datetime "updated_at", null: false
     t.string "user_id", null: false
-    t.index ["user_id"], name: "index_two_factors_on_user_id"
+    t.index ["user_id"], name: "index_two_factors_on_user_id_unique", unique: true
   end
 
   create_table "users", id: :string, force: :cascade do |t|
@@ -285,6 +296,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_021156) do
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.string "reset_password_token_digest"
     t.boolean "two_factor_enabled", default: false
     t.string "unconfirmed_email"
     t.datetime "updated_at", null: false
@@ -293,9 +305,46 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_04_021156) do
     t.index ["display_username"], name: "index_users_on_display_username", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["reset_password_token_digest"], name: "index_users_on_reset_password_token_digest", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  create_table "vec_embeddings_chunks", primary_key: "chunk_id", force: :cascade do |t|
+    t.binary "rowids", null: false
+    t.integer "size", null: false
+    t.binary "validity", null: false
+  end
+
+# Could not dump table "vec_embeddings_info" because of following StandardError
+#   Unknown type 'ANY' for column 'value'
+
+
+  create_table "vec_embeddings_rowids", primary_key: "rowid", force: :cascade do |t|
+    t.integer "chunk_id"
+    t.integer "chunk_offset"
+    t.text "id", null: false
+  end
+
+# Could not dump table "vec_embeddings_vector_chunks00" because of following StandardError
+#   Unknown type '' for column 'rowid'
+
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-end
+  add_foreign_key "api_keys", "users"
+  add_foreign_key "conversations", "users"
+  add_foreign_key "job_application_contacts", "job_applications", column: "application_id"
+  add_foreign_key "job_application_histories", "job_applications", column: "application_id"
+  add_foreign_key "job_applications", "users"
+  add_foreign_key "knowledge_documents", "users"
+  add_foreign_key "messages", "conversations"
+  add_foreign_key "oauth_accounts", "users"
+  add_foreign_key "passkeys", "users"
+  add_foreign_key "resume_statistics", "resumes"
+  add_foreign_key "resumes", "users"
+  add_foreign_key "sessions", "users"
+  add_foreign_key "tool_calls", "messages"
+  add_foreign_key "two_factors", "users"
+
+  # Virtual tables defined in this database.
+  # Note that virtual tables may not work with other database engines. Be careful if changing database.
