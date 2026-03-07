@@ -1,6 +1,8 @@
 module Api
   module V1
     class PromptsController < BaseController
+      before_action :require_admin!, only: :update
+
       def index
         prompts = AiPrompt.all.order(:slug)
         render json: prompts.map { |p| prompt_json(p) }
@@ -21,6 +23,13 @@ module Api
 
       def prompt_params
         params.permit(:title, :description, :content)
+      end
+
+      def require_admin!
+        admin_emails = ENV.fetch("ADMIN_EMAILS", "").split(",").map(&:strip)
+        unless admin_emails.include?(current_user.email)
+          render json: { error: "Forbidden" }, status: :forbidden
+        end
       end
 
       def prompt_json(prompt)

@@ -23,7 +23,7 @@ module Api
           KnowledgeIngestJob.perform_later(document.id)
           render json: document_json(document), status: :created
         else
-          render json: { errors: document.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: document.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -36,7 +36,7 @@ module Api
           end
           render json: document_json(@document)
         else
-          render json: { errors: @document.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: @document.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -51,7 +51,7 @@ module Api
       # POST /api/v1/knowledge/:id/sync
       def sync
         unless @document.source_type == "google_sheet"
-          render json: { error: "Only Google Sheet documents can be synced" }, status: :unprocessable_entity
+          render json: { error: "Only Google Sheet documents can be synced" }, status: :unprocessable_content
           return
         end
 
@@ -63,7 +63,7 @@ module Api
       def search
         query = params[:query]
         if query.blank?
-          render json: { error: "Query is required" }, status: :unprocessable_entity
+          render json: { error: "Query is required" }, status: :unprocessable_content
           return
         end
 

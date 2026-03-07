@@ -5,6 +5,7 @@ module Api
 
       def pdf
         url = Printer::GeneratePdf.new(resume: @resume).call
+        @resume.statistics&.record_download!
         render json: { url: url }
       rescue RuntimeError => e
         render json: { error: e.message }, status: :service_unavailable

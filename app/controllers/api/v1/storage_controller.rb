@@ -15,6 +15,11 @@ module Api
       end
 
       def destroy
+        unless params[:path].present?
+          render json: { error: "Path is required" }, status: :unprocessable_content
+          return
+        end
+
         Storage::DeleteFile.new(
           user: current_user,
           path: params[:path]

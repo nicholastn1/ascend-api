@@ -7,11 +7,10 @@ module Api
         user = User.find_by!(username: params[:username])
         resume = user.resumes.public_resumes.find_by!(slug: params[:slug])
 
-        resume.statistics&.record_view!
-
         if resume.password_protected?
-          render json: { requires_password: true, id: resume.id }
+          render json: { requires_password: true }
         else
+          resume.statistics&.record_view!
           render json: public_resume_json(resume)
         end
       rescue ActiveRecord::RecordNotFound
@@ -23,6 +22,7 @@ module Api
         resume = user.resumes.public_resumes.find_by!(slug: params[:slug])
 
         if resume.authenticate_password(params[:password])
+          resume.statistics&.record_view!
           render json: public_resume_json(resume)
         else
           render json: { error: "Invalid password" }, status: :unauthorized

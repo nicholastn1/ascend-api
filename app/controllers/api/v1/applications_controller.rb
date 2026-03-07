@@ -65,7 +65,7 @@ module Api
 
       def application_params
         params.permit(
-          :company_name, :job_title, :job_url, :current_status,
+          :company_name, :job_title, :job_url,
           :salary_amount, :salary_currency, :salary_period,
           :notes, :application_date
         )
@@ -73,7 +73,10 @@ module Api
 
       def apply_filters(scope)
         scope = scope.by_status(params[:status]) if params[:status].present?
-        scope = scope.where("company_name LIKE ?", "%#{params[:company]}%") if params[:company].present?
+        if params[:company].present?
+          sanitized_company = params[:company].gsub(/[%_]/, "")
+          scope = scope.where("company_name LIKE ?", "%#{sanitized_company}%")
+        end
 
         if params[:date_from].present?
           scope = scope.where("application_date >= ?", params[:date_from])

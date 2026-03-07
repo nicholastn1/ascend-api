@@ -5,7 +5,10 @@ module Api
 
       def index
         resumes = current_user.resumes.ordered
-        resumes = resumes.where("json_extract(tags, '$') LIKE ?", "%#{params[:tag]}%") if params[:tag].present?
+        if params[:tag].present?
+          sanitized_tag = params[:tag].gsub(/[%_]/, "")
+          resumes = resumes.where("json_extract(tags, '$') LIKE ?", "%#{sanitized_tag}%")
+        end
 
         render json: resumes.map { |r| resume_summary_json(r) }
       end
@@ -27,6 +30,8 @@ module Api
           data: params[:data].present? ? params[:data].to_unsafe_h : @resume.data
         ))
         render json: resume_json(@resume)
+      rescue ::Resumes::ResumeLockedError => e
+        render json: { error: e.message }, status: :forbidden
       end
 
       def destroy
@@ -53,6 +58,11 @@ module Api
       end
 
       def set_password
+        unless params[:password].present?
+          render json: { error: "Password is required" }, status: :unprocessable_content
+          return
+        end
+
         @resume.update!(password: params[:password])
         render json: { message: "Password set" }
       end
