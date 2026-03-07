@@ -14,11 +14,13 @@ PROMPTS.each do |prompt_data|
 
   content = File.read(file_path)
 
-  AiPrompt.find_or_create_by!(slug: prompt_data[:slug]) do |prompt|
-    prompt.title = prompt_data[:title]
-    prompt.description = prompt_data[:description]
-    prompt.content = content
-  end
+  prompt = AiPrompt.find_or_initialize_by(slug: prompt_data[:slug])
+  prompt.assign_attributes(
+    title: prompt_data[:title],
+    description: prompt_data[:description],
+    content: content
+  )
+  prompt.save!
 
   puts "  Seeded prompt: #{prompt_data[:slug]}"
 end
