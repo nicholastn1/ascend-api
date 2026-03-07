@@ -2,30 +2,25 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  url: <%= ENV["DATABASE_URL"] || ENV["DATABASE_PRIVATE_URL"] %>
 
 development:
   <<: *default
   database: ascend_api_development
-  url: <%= ENV["DATABASE_URL"] %>
 
 test:
   <<: *default
   database: ascend_api_test
-  url: <%= ENV["DATABASE_URL"] %>
 
 production:
   primary:
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
   cache:
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
     migrations_paths: db/cache_migrate
   queue:
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
     migrations_paths: db/cable_migrate
