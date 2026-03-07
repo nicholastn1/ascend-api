@@ -12,8 +12,9 @@ module Chat
       # Save user message
       @conversation.messages.create!(role: "user", content: @content)
 
-      # Build RubyLLM chat with history
-      chat = RubyLLM.chat(model: @conversation.model_id)
+      ai_config = AiConfig.instance
+      model_id = @conversation.model_id.presence || ai_config.model
+      chat = RubyLLM.chat(model: model_id)
 
       # Set system prompt with RAG context
       system_prompt = load_system_prompt
@@ -30,7 +31,8 @@ module Chat
       end
 
       # Get response
-      assistant_msg = @conversation.messages.create!(role: "assistant", content: "")
+      @assistant_msg = @conversation.messages.create!(role: "assistant", content: "")
+      assistant_msg = @assistant_msg
       full_content = ""
 
       if @on_chunk
@@ -57,8 +59,8 @@ module Chat
 
       assistant_msg
     rescue => e
-      # Clean up empty assistant message on error
-      @conversation.messages.where(role: "assistant", content: "").destroy_all
+      # Clean up only the assistant message created in this request
+      @assistant_msg&.destroy if @assistant_msg&.content.blank?
       raise
     end
 

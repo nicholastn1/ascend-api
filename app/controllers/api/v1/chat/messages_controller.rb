@@ -49,7 +49,8 @@ module Api
         rescue ::Chat::RateLimitChecker::RateLimitExceeded => e
           sse_write_event("error", { error: e.message })
         rescue => e
-          sse_write_event("error", { error: e.message })
+          Rails.logger.error("Chat streaming error: #{e.class}: #{e.message}")
+          sse_write_event("error", { error: "An error occurred processing your message" })
         ensure
           response.stream.close
         end

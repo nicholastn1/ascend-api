@@ -41,7 +41,7 @@ module Api
         end
 
         def default_model
-          ENV.fetch("DEFAULT_CHAT_MODEL", "openrouter/auto")
+          AiConfig.instance.model
         end
 
         def conversation_json(conversation, include_messages: false)

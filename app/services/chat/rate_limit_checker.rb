@@ -16,7 +16,7 @@ module Chat
       {
         used: messages_today,
         limit: daily_limit,
-        remaining: [daily_limit - messages_today, 0].max,
+        remaining: [ daily_limit - messages_today, 0 ].max,
         resets_at: Time.current.end_of_day.utc.iso8601
       }
     end
