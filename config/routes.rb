@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount Rswag::Ui::Engine => "/api-docs"
+  mount Rswag::Api::Engine => "/api-docs"
   get "up" => "rails/health#show", as: :rails_health_check
 
   namespace :api do
@@ -100,6 +102,9 @@ Rails.application.routes.draw do
       post "ai/test-connection", to: "ai#test_connection"
       post "ai/parse-pdf", to: "ai#parse_pdf"
       post "ai/parse-docx", to: "ai#parse_docx"
+      get "ai/config", to: "ai_config#show"
+      put "ai/config", to: "ai_config#update"
+      post "ai/config/test", to: "ai_config#test_connection"
 
       # Prompts
       resources :prompts, only: %i[index show update], param: :slug
