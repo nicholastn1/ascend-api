@@ -4,15 +4,8 @@ RSpec.describe Knowledge::EmbeddingService do
   let(:user) { create(:user) }
   let(:dimensions) { VectorSearch::EMBEDDING_DIMENSIONS }
 
-  before(:each) do
-    VectorSearch.reset!
-    VectorSearch.ensure_table!
-  end
-
   after(:each) do
-    VectorSearch.reset!
-    path = Rails.root.join("storage", "test_vectors.sqlite3")
-    FileUtils.rm_f(path)
+    EmbeddingChunk.destroy_all
   end
 
   describe "#embed_document" do

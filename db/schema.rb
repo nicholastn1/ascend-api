@@ -11,6 +11,8 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.1].define(version: 2026_03_07_010000) do
+  enable_extension "vector"
+
   create_table "active_storage_attachments", id: :string, force: :cascade do |t|
     t.string "blob_id", null: false
     t.datetime "created_at", null: false
@@ -101,6 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_010000) do
     t.datetime "created_at", null: false
     t.string "document_id", null: false
     t.string "document_type", null: false
+    t.vector "embedding", limit: 768
     t.datetime "updated_at", null: false
     t.index ["document_id", "document_type"], name: "index_embedding_chunks_on_document_id_and_document_type"
     t.index ["document_type"], name: "index_embedding_chunks_on_document_type"
@@ -309,26 +312,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_010000) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
-  create_table "vec_embeddings_chunks", primary_key: "chunk_id", force: :cascade do |t|
-    t.binary "rowids", null: false
-    t.integer "size", null: false
-    t.binary "validity", null: false
-  end
-
-# Could not dump table "vec_embeddings_info" because of following StandardError
-#   Unknown type 'ANY' for column 'value'
-
-
-  create_table "vec_embeddings_rowids", primary_key: "rowid", force: :cascade do |t|
-    t.integer "chunk_id"
-    t.integer "chunk_offset"
-    t.text "id", null: false
-  end
-
-# Could not dump table "vec_embeddings_vector_chunks00" because of following StandardError
-#   Unknown type '' for column 'rowid'
-
-
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "api_keys", "users"
@@ -345,6 +328,3 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_010000) do
   add_foreign_key "sessions", "users"
   add_foreign_key "tool_calls", "messages"
   add_foreign_key "two_factors", "users"
-
-  # Virtual tables defined in this database.
-  # Note that virtual tables may not work with other database engines. Be careful if changing database.

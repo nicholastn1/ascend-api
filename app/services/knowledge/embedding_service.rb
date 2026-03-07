@@ -7,7 +7,7 @@ module Knowledge
     BATCH_SIZE = 20       # max texts per embedding API call
 
     # Embed a document (KnowledgeDocument or Resume) by chunking its text
-    # and storing embeddings in sqlite-vec.
+    # and storing embeddings via pgvector.
     def self.embed_document(document)
       new.embed_document(document)
     end

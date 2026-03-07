@@ -21,7 +21,7 @@ module Knowledge
       response = RubyLLM.embed(query, model: EMBEDDING_MODEL, dimensions: EMBEDDING_DIMENSIONS)
       query_embedding = response.vectors
 
-      # Search sqlite-vec
+      # Search via pgvector
       raw_results = VectorSearch.search(query_embedding: query_embedding, limit: limit * 2)
 
       # Hydrate with chunk metadata, optionally filter by user

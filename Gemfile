@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 # Framework
 gem "rails", "~> 8.1.2"
-gem "sqlite3", ">= 2.1"
+gem "pg", "~> 1.5"
 gem "puma", ">= 5.0"
 
 # Solid Stack
@@ -33,7 +33,7 @@ gem "aws-sdk-s3", require: false
 
 # AI
 gem "ruby_llm"
-gem "sqlite-vec"
+gem "neighbor"
 
 # Google Sheets (RAG)
 gem "google-apis-sheets_v4"
