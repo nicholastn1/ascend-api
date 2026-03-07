@@ -21,7 +21,7 @@ Rails.application.configure do
 
   config.active_storage.service = ENV["S3_BUCKET"].present? ? :amazon : :local
 
-  config.cache_store = :solid_cache_store
+  config.cache_store = :memory_store
 
   config.i18n.fallbacks = true
 

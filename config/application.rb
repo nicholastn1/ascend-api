@@ -26,8 +26,8 @@ module AscendApi
     # Default URL for Action Mailer
     config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "localhost:3000") }
 
-    # Active Job queue adapter
-    config.active_job.queue_adapter = :solid_queue
+    # Active Job queue adapter — use async in-process for single-instance deploys
+    config.active_job.queue_adapter = :async
 
     # Generator config
     config.generators do |g|
