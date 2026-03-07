@@ -1,7 +1,7 @@
 class JobApplication < ApplicationRecord
   include BelongsToUser
 
-  STATUSES = %w[applied screening interview offer negotiation accepted rejected].freeze
+  STATUSES = %w[applied screening interviewing offer accepted rejected withdrawn].freeze
 
   has_many :contacts, class_name: "JobApplicationContact",
     foreign_key: :application_id, dependent: :destroy

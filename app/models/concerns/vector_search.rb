@@ -21,8 +21,8 @@ module VectorSearch
     end
 
     def reset!
-      @connection&.close rescue nil
-      @connection = nil
+      Thread.current[:vector_search_connection]&.close rescue nil
+      Thread.current[:vector_search_connection] = nil
     end
 
     def insert(chunk_id:, embedding:)
@@ -30,7 +30,7 @@ module VectorSearch
       blob = SQLite3::Blob.new(embedding.pack("f*"))
       connection.execute(
         "INSERT OR REPLACE INTO vec_embeddings(chunk_id, embedding) VALUES (?, ?)",
-        [chunk_id, blob]
+        [ chunk_id, blob ]
       )
     end
 
@@ -38,7 +38,7 @@ module VectorSearch
       ensure_table!
       connection.execute(
         "DELETE FROM vec_embeddings WHERE chunk_id = ?",
-        [chunk_id]
+        [ chunk_id ]
       )
     end
 
@@ -59,7 +59,7 @@ module VectorSearch
       connection.results_as_hash = true
       results = connection.execute(
         "SELECT chunk_id, distance FROM vec_embeddings WHERE embedding MATCH ? ORDER BY distance LIMIT ?",
-        [blob, limit]
+        [ blob, limit ]
       )
       results
     end
@@ -67,7 +67,8 @@ module VectorSearch
     private
 
     def connection
-      @connection ||= begin
+      # Thread-local connection for thread safety with SQLite
+      Thread.current[:vector_search_connection] ||= begin
         db_path = vector_db_path
         FileUtils.mkdir_p(File.dirname(db_path))
         db = SQLite3::Database.new(db_path)

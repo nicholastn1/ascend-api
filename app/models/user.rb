@@ -15,8 +15,9 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: { case_sensitive: false },
     format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :username, presence: true, uniqueness: { case_sensitive: false },
-    format: { with: /\A[a-z0-9_-]+\z/ }
+    format: { with: /\A[a-z0-9_-]+\z/ }, length: { in: 3..50 }
   validates :display_username, presence: true, uniqueness: { case_sensitive: false }
+  validates :password, length: { minimum: 8 }, allow_nil: true
 
   before_validation :normalize_email
   before_validation :set_display_username, on: :create

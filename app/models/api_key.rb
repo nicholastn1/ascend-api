@@ -7,10 +7,11 @@ class ApiKey < ApplicationRecord
 
   def self.authenticate(raw_key)
     digest = Digest::SHA256.hexdigest(raw_key)
-    key = active.find_by(key_digest: digest)
+    key = active.includes(:user).find_by(key_digest: digest)
     return nil unless key
 
-    key.update(last_request_at: Time.current, request_count: key.request_count + 1)
+    # Atomic increment to avoid race conditions
+    where(id: key.id).update_all([ "request_count = request_count + 1, last_request_at = ?", Time.current ])
     key.user
   end
 
