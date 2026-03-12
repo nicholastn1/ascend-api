@@ -10,7 +10,13 @@ class JobApplication < ApplicationRecord
 
   validates :company_name, presence: true
   validates :job_title, presence: true
-  validates :current_status, inclusion: { in: STATUSES }
+  validate :current_status_in_valid_set
+
+  def current_status_in_valid_set
+    return if current_status.blank?
+    valid = STATUSES.include?(current_status) || user&.custom_statuses&.exists?(slug: current_status)
+    errors.add(:current_status, "is invalid") unless valid
+  end
 
   scope :by_status, ->(status) { where(current_status: status) }
   scope :ordered, -> { order(created_at: :desc) }

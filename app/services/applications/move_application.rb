@@ -26,9 +26,10 @@ module Applications
     private
 
     def validate_status!
-      unless JobApplication::STATUSES.include?(@new_status)
-        raise ArgumentError, "Invalid status: #{@new_status}"
-      end
+      user = @application.user
+      valid = JobApplication::STATUSES.include?(@new_status) ||
+        user&.custom_statuses&.exists?(slug: @new_status)
+      raise ArgumentError, "Invalid status: #{@new_status}" unless valid
     end
   end
 end

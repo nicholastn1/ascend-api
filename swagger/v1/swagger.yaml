@@ -157,9 +157,36 @@ paths:
       - bearer_auth: []
       responses:
         '200':
-          description: kanban board returned
+          description: kanban board returned (columns follow user workflow)
         '401':
           description: unauthorized
+  "/api/v1/applications/migrate_status":
+    post:
+      summary: Migrate all applications from one status to another
+      tags:
+      - Applications
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: applications migrated
+        '422':
+          description: invalid status
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                from_status:
+                  type: string
+                to_status:
+                  type: string
+              required:
+              - from_status
+              - to_status
   "/api/v1/applications/{id}":
     get:
       summary: Get a job application
@@ -1373,6 +1400,54 @@ paths:
                   type: string
                 image:
                   type: string
+  "/api/v1/users/me/application_workflow":
+    get:
+      summary: Get application workflow (Job Tracker column config)
+      tags:
+      - Applications
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: workflow with ordered statuses (system + custom)
+        '401':
+          description: unauthorized
+    put:
+      summary: Update application workflow (order, add/remove custom statuses)
+      tags:
+      - Applications
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: workflow updated
+        '422':
+          description: cannot remove status with applications (migrate first)
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statuses:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      slug:
+                        type: string
+                      label:
+                        type: string
+                      is_custom:
+                        type: boolean
+                      color:
+                        type: string
+                      position:
+                        type: integer
+              required:
+              - statuses
   "/api/v1/profile/password":
     put:
       summary: Update password

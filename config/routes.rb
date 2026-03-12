@@ -47,6 +47,10 @@ Rails.application.routes.draw do
       put "profile", to: "profiles#update"
       put "profile/password", to: "profiles#update_password"
 
+      # Application workflow (Job Tracker column customization)
+      get "users/me/application_workflow", to: "application_workflows#show"
+      put "users/me/application_workflow", to: "application_workflows#update"
+
       # Resumes
       resources :resumes, only: %i[index create show update destroy] do
         member do
@@ -81,6 +85,7 @@ Rails.application.routes.draw do
 
         collection do
           get :kanban
+          post :migrate_status
           get "analytics/overview", to: "application_analytics#overview"
           get "analytics/timeline", to: "application_analytics#timeline"
           get "analytics/funnel", to: "application_analytics#funnel"

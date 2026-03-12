@@ -8,6 +8,8 @@ class User < ApplicationRecord
   has_many :api_keys, dependent: :destroy
   has_many :resumes, dependent: :destroy
   has_many :job_applications, dependent: :destroy
+  has_one :application_workflow, class_name: "UserApplicationWorkflow", dependent: :destroy
+  has_many :custom_statuses, class_name: "UserCustomStatus", dependent: :destroy
   has_many :conversations, dependent: :destroy
   has_many :knowledge_documents, dependent: :destroy
 

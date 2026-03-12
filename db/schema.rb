@@ -10,7 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_07_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_12_030347) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
 
   create_table "active_storage_attachments", id: :string, force: :cascade do |t|
@@ -285,6 +287,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_010000) do
     t.index ["user_id"], name: "index_two_factors_on_user_id_unique", unique: true
   end
 
+  create_table "user_application_workflows", id: :string, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "status_slugs", default: []
+    t.datetime "updated_at", null: false
+    t.string "user_id", null: false
+    t.index ["user_id"], name: "index_user_application_workflows_on_user_id", unique: true
+  end
+
+  create_table "user_custom_statuses", id: :string, force: :cascade do |t|
+    t.string "color"
+    t.datetime "created_at", null: false
+    t.string "label", null: false
+    t.integer "position", default: 0, null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_id", null: false
+    t.index ["user_id", "slug"], name: "index_user_custom_statuses_on_user_id_and_slug", unique: true
+  end
+
   create_table "users", id: :string, force: :cascade do |t|
     t.datetime "confirmation_sent_at"
     t.string "confirmation_token"
@@ -328,4 +349,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_07_010000) do
   add_foreign_key "sessions", "users"
   add_foreign_key "tool_calls", "messages"
   add_foreign_key "two_factors", "users"
+  add_foreign_key "user_application_workflows", "users"
+  add_foreign_key "user_custom_statuses", "users"
 end

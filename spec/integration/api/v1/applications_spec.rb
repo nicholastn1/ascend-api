@@ -73,6 +73,70 @@ RSpec.describe "Applications API", type: :request do
     end
   end
 
+  path "/api/v1/users/me/application_workflow" do
+    get "Get application workflow" do
+      tags "Applications"
+      produces "application/json"
+      security [ { bearer_auth: [] } ]
+
+      response "200", "workflow returned" do
+        run_test! do |res|
+          json = JSON.parse(res.body)
+          expect(json).to have_key("statuses")
+          expect(json["statuses"]).to be_an(Array)
+        end
+      end
+
+      response "401", "unauthorized" do
+        let(:Authorization) { "" }
+        run_test!
+      end
+    end
+
+    put "Update application workflow" do
+      tags "Applications"
+      consumes "application/json"
+      produces "application/json"
+      security [ { bearer_auth: [] } ]
+      parameter name: :body, in: :body, schema: {
+        type: :object,
+        properties: {
+          statuses: {
+            type: :array,
+            items: {
+              type: :object,
+              properties: {
+                slug: { type: :string },
+                label: { type: :string },
+                is_custom: { type: :boolean },
+                color: { type: :string },
+                position: { type: :integer }
+              }
+            }
+          }
+        },
+        required: %w[statuses]
+      }
+
+      response "200", "workflow updated" do
+        let(:body) do
+          {
+            statuses: JobApplication::STATUSES.map.with_index do |s, i|
+              { slug: s, label: s.titleize, is_custom: false, position: i }
+            end
+          }
+        end
+        run_test!
+      end
+
+      response "401", "unauthorized" do
+        let(:Authorization) { "" }
+        let(:body) { { statuses: [] } }
+        run_test!
+      end
+    end
+  end
+
   path "/api/v1/applications/kanban" do
     get "Get applications grouped by status (kanban)" do
       tags "Applications"
@@ -82,13 +146,47 @@ RSpec.describe "Applications API", type: :request do
       response "200", "kanban board returned" do
         before do
           create(:job_application, user: user, current_status: "applied")
-          create(:job_application, user: user, current_status: "interview")
+          create(:job_application, user: user, current_status: "interviewing")
         end
         run_test!
       end
 
       response "401", "unauthorized" do
         let(:Authorization) { "" }
+        run_test!
+      end
+    end
+  end
+
+  path "/api/v1/applications/migrate_status" do
+    post "Migrate applications from one status to another" do
+      tags "Applications"
+      consumes "application/json"
+      produces "application/json"
+      security [ { bearer_auth: [] } ]
+      parameter name: :body, in: :body, schema: {
+        type: :object,
+        properties: {
+          from_status: { type: :string },
+          to_status: { type: :string }
+        },
+        required: %w[from_status to_status]
+      }
+
+      response "200", "applications migrated" do
+        before { create(:job_application, user: user, current_status: "screening") }
+        let(:body) { { from_status: "screening", to_status: "interviewing" } }
+        run_test!
+      end
+
+      response "422", "invalid status" do
+        let(:body) { { from_status: "screening", to_status: "invalid_status" } }
+        run_test!
+      end
+
+      response "401", "unauthorized" do
+        let(:Authorization) { "" }
+        let(:body) { { from_status: "screening", to_status: "interviewing" } }
         run_test!
       end
     end

@@ -12,8 +12,10 @@ module Api
 
       def kanban
         apps = current_user.job_applications
+        workflow = Applications::WorkflowService.new(user: current_user)
+        status_slugs = workflow.ordered_slugs
 
-        grouped = JobApplication::STATUSES.index_with do |status|
+        grouped = status_slugs.index_with do |status|
           apps.by_status(status).ordered.map { |a| application_json(a) }
         end
 
@@ -57,6 +59,18 @@ module Api
         head :no_content
       end
 
+      def migrate_status
+        result = Applications::MigrateStatus.new(
+          user: current_user,
+          from_status: params.require(:from_status),
+          to_status: params.require(:to_status)
+        ).call
+
+        render json: result
+      rescue ArgumentError => e
+        render json: { error: e.message }, status: :unprocessable_entity
+      end
+
       private
 
       def set_application
@@ -65,7 +79,7 @@ module Api
 
       def application_params
         params.permit(
-          :company_name, :job_title, :job_url,
+          :company_name, :job_title, :job_url, :current_status,
           :salary_amount, :salary_currency, :salary_period,
           :notes, :application_date
         )

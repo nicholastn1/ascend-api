@@ -1,4 +1,9 @@
 class Rack::Attack
+  # Disable rate limiting in development
+  if Rails.env.development?
+    self.enabled = false
+  end
+
   # Safelist health check endpoints from rate limiting
   safelist("health-checks") do |req|
     req.path == "/up" || req.path == "/api/v1/health"

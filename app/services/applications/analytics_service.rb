@@ -3,6 +3,7 @@ module Applications
     def initialize(user:)
       @user = user
       @applications = @user.job_applications
+      @workflow = WorkflowService.new(user: @user)
     end
 
     def overview
@@ -11,7 +12,7 @@ module Applications
 
       {
         total: total,
-        by_status: JobApplication::STATUSES.index_with { |s| counts[s] || 0 }
+        by_status: @workflow.ordered_slugs.index_with { |s| counts[s] || 0 }
       }
     end
 
@@ -38,8 +39,10 @@ module Applications
 
       return [] if total == 0
 
-      # Order statuses by typical progression
+      # Order statuses by typical progression (only include statuses in user's workflow)
       progression = %w[applied screening interviewing offer accepted]
+      status_slugs = @workflow.ordered_slugs
+      progression = progression & status_slugs
 
       cumulative = total
       progression.map do |status|
@@ -67,7 +70,8 @@ module Applications
         end
       end
 
-      JobApplication::STATUSES.map do |status|
+      status_slugs = @workflow.ordered_slugs
+      status_slugs.map do |status|
         durations = stage_durations[status]
         avg = durations.empty? ? 0 : (durations.sum / durations.size).round(1)
         { status: status, avg_days: avg, sample_size: durations.size }
