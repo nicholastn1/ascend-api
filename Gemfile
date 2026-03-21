@@ -22,7 +22,7 @@ gem "webauthn"
 gem "rack-cors"
 gem "rack-attack"
 gem "hana" # RFC 6902 JSON Patch
-gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.22"
 gem "jwt"
 gem "rswag-api"
 gem "rswag-ui"
